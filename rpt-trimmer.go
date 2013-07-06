@@ -75,7 +75,7 @@ func main() {
 
             // specify which regex to use based on mode
             if mode == "simple" {
-                reg, err = regexp.Compile(" by .*? (.*?).*?$")
+                reg, err = regexp.Compile("\\. .*? position: \\[.*$")
             } else {
                 reg, err = regexp.Compile("\\. Near players.*$")
             }
@@ -90,14 +90,20 @@ func main() {
             fmt.Println(r_line)
         // or if it's a wounded line
         } else if wounded.MatchString(line) {
+            var reg *regexp.Regexp
+            var err error
+            // hack needed for this single case
+            // wounded lines appear to be in what I would consider already
+            // extended, simple modifications are the only ones needed
+            r_line := line
             if mode == "simple" {
-                reg, err := regexp.Compile(" for .*? damage.*$")
+                reg, err = regexp.Compile(" for .*? damage.*$")
                 if err != nil {
                     die("something happened in the scanner loop compiling regex " + err.Error(), 1)
                 }
-                r_line := reg.ReplaceAllLiteralString(line, EOL)
-                fmt.Println(r_line)
+                r_line = reg.ReplaceAllLiteralString(line, EOL)
             }
+            fmt.Println(r_line)
         // or if it's a died or bleeder line
         } else if died.MatchString(line) || bleeder.MatchString(line) {
             var reg *regexp.Regexp
