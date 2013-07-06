@@ -1,10 +1,12 @@
 package main
 
-import "os"
-import "bufio"
-import "fmt"
-import "regexp"
-import "flag"
+import (
+    "os"
+    "bufio"
+    "fmt"
+    "regexp"
+    "flag"
+)
 
 var useExt, useSimple bool
 
@@ -96,8 +98,8 @@ func main() {
                 r_line := reg.ReplaceAllLiteralString(line, EOL)
                 fmt.Println(r_line)
             }
-        // or if it's a died line
-        } else if died.MatchString(line) {
+        // or if it's a died or bleeder line
+        } else if died.MatchString(line) || bleeder.MatchString(line) {
             var reg *regexp.Regexp
             var err error
             if mode == "simple" {
@@ -106,21 +108,7 @@ func main() {
                 reg, err = regexp.Compile("\\. Near players.*$")
             }
             if err != nil {
-                die("somethign happened in the scanner loop compiling regex " + err.Error(), 1)
-            }
-            r_line := reg.ReplaceAllLiteralString(line, EOL)
-            fmt.Println(r_line)
-        // or if it's a bleeder line
-        } else if bleeder.MatchString(line) {
-            var reg *regexp.Regexp
-            var err error
-            if mode == "simple" {
-                reg, err = regexp.Compile(" at \\[.*$")
-            } else {
-                reg, err = regexp.Compile("\\. Near players.*$")
-            }
-            if err != nil {
-                die("somethign happened in the scanner loop compiling regex " + err.Error(), 1)
+                die("something happened in the scanner loop compiling regex " + err.Error(), 1)
             }
             r_line := reg.ReplaceAllLiteralString(line, EOL)
             fmt.Println(r_line)
